@@ -1,0 +1,39 @@
+{
+  "name": "@bscswap/token-contracts",
+  "description": "🎛 Token contracts for the BSCswap protocol",
+  "version": "1.0.0",
+  "homepage": "https://bscswap.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bscswap/token-contracts"
+  },
+  "keywords": [
+    "bscswap",
+    "ethereum",
+    "solidity",
+    "binance"
+  ],
+  "files": [
+    "contracts",
+    "build",
+    "flatten"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "3.2.0",
+    "@openzeppelin/upgrades": "2.8.0"
+  },
+  "devDependencies": {
+    "ethereum-waffle": "2.5.0",
+    "rimraf": "^3.0.0",
+    "solc": "0.6.12"
+  },
+  "scripts": {
+    "clean": "rimraf ./build/ ./flatten/",
+    "precompile": "yarn clean",
+    "compile": "waffle .waffle.json && waffle flatten"
+  },
+  "license": "MIT"
+}
