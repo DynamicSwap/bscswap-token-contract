@@ -622,6 +622,8 @@ pragma solidity ^0.6.12;
      uint256 public totalreward;
      // Starting timestamp for LaunchField
      uint256 public starttime;
+     // The timestamp when stakers should be allowed to withdraw
+     uint256 public stakingtime;
      uint256 public eraPeriod = 0;
      uint256 public rewardRate = 0;
      uint256 public lastUpdateTime;
@@ -646,11 +648,12 @@ pragma solidity ^0.6.12;
          _;
      }
 
-     constructor(address _depositToken, address _rewardToken, uint256 _totalreward, uint256 _starttime) public {
+     constructor(address _depositToken, address _rewardToken, uint256 _totalreward, uint256 _starttime, uint256 _stakingtime) public {
          super.initialize(_depositToken, msg.sender);
          rewardToken = IERC20(_rewardToken);
 
          starttime = _starttime;
+         stakingtime = _stakingtime;
          notifyRewardAmount(_totalreward.mul(50).div(100));
      }
 
@@ -686,18 +689,18 @@ pragma solidity ^0.6.12;
          emit Staked(msg.sender, amount);
      }
 
-     function withdraw(uint256 amount) public updateReward(msg.sender) checkhalve checkStart{
+     function withdraw(uint256 amount) public updateReward(msg.sender) checkhalve checkStart stakingTime{
         require(amount > 0, "ERROR: Cannot withdraw 0");
         super._withdraw(amount);
         emit Withdrawn(msg.sender, amount);
     }
 
-    function exit() external{
+    function exit() external stakingTime{
         withdraw(balanceOf(msg.sender));
         _getRewardInternal();
     }
 
-     function getReward() public updateReward(msg.sender) checkhalve checkStart{
+     function getReward() public updateReward(msg.sender) checkhalve checkStart stakingTime{
          uint256 reward = earned(msg.sender);
          uint256 bal = balanceOf(msg.sender);
          if (reward > 0) {
@@ -734,6 +737,11 @@ pragma solidity ^0.6.12;
 
      modifier checkStart(){
          require(block.timestamp > starttime,"ERROR: Not start");
+         _;
+     }
+
+     modifier stakingTime(){
+         require(block.timestamp >= stakingtime,"ERROR: Withdrawals not allowed yet");
          _;
      }
 
